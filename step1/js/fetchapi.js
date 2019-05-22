@@ -1,6 +1,5 @@
 let studentsList = [];
 function getStudents(){
-
     //FetchAPI
     //Fetch always return Promise with resolve
     fetch('http://localhost:3000/contacts').then(response =>{
@@ -51,7 +50,7 @@ function displayReposToHTML(studentsListResponse){
                     <td>${student.name}</td>
                     <td>${student.email}</td>
                     <td>${student.contactno}</td>
-                    <td><button class='btn btn-primary'>Update</button></td>
+                    <td><button class='btn btn-primary btn-lg'  data-toggle="modal" data-target="#myModal">Update</button></td>
                     <td ><i class='fa fa-trash' style='color:red;font-size:1.2em;cursor:pointer' onclick='deleteStudent(${student.id})'></i></td>
                     </tr>
      `;   
@@ -59,9 +58,23 @@ function displayReposToHTML(studentsListResponse){
 
     tbodyEle.innerHTML = tbodyEleInnerHTMLString;
    
-    
 }
 
+function updateStudent(id){
+    console.log('delete Student--',id);
+    
+    fetch(`http://localhost:3000/contacts/${id}`,{
+        method:'DELETE'
+    }).then(response =>{
+        if(response.ok){
+            return response.json();
+        }
+    }).then(result =>{
+        console.log('result from delete',result);
+        //write the code for DOM manipulation
+		addStudents();
+    })
+}
 
 //adding student to db
 function addStudent(event){
@@ -100,7 +113,7 @@ function addStudent(event){
     //   console.log(tbodyEle.innerHTML);
         let tbodyEle = document.getElementById('table-body');
         console.log(tbodyEle);
-        
+        getStudents();
       
       
   }).catch(error=>{
@@ -122,5 +135,33 @@ function deleteStudent(id){
     }).then(result =>{
         console.log('result from delete',result);
         //write the code for DOM manipulation
+		getStudents();
     })
+}
+
+function searchStudent(event){
+	var e = event || window.event || arguments.callee.caller.arguments[0]; 
+    if(e && e.keyCode==13){ // enter 键
+		let tableEle = document.getElementsByTagName('table')[1];
+
+    let tbodyEle = tableEle.getElementsByTagName('tbody')[0];
+  //console.log(tbodyEle);
+    let tbodyEleInnerHTMLString = '';
+
+    studentsList.forEach(student =>{
+   //     console.log(repo.web_url + '--'+repo.owner.username );
+	//alert(${student.name});
+     tbodyEleInnerHTMLString += `
+                <tr>
+                    <td>${student.name}</td>
+                    <td>${student.email}</td>
+                    <td>${student.contactno}</td>
+                    <td><button class='btn btn-primary'  data-toggle="modal" data-target="#myModal">Update</button></td>
+                    <td ><i class='fa fa-trash' style='color:red;font-size:1.2em;cursor:pointer' onclick='deleteStudent(${student.id})'></i></td>
+                    </tr>
+     `;   
+    });
+
+    tbodyEle.innerHTML = tbodyEleInnerHTMLString;
+    }
 }
